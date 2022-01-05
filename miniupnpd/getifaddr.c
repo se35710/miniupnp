@@ -25,6 +25,9 @@
 #if defined(USE_GETIFADDRS) || defined(ENABLE_IPV6) || defined(ENABLE_PCP)
 #include <ifaddrs.h>
 #endif
+#if defined(ENABLE_IPV6)
+#include "ip6addr.h"
+#endif
 
 int
 getifaddr(const char * ifname, char * buf, int len,
@@ -246,7 +249,9 @@ find_ipv6_addr(const char * ifname,
 		{
 			addr = (const struct sockaddr_in6 *)ife->ifa_addr;
 			if(!IN6_IS_ADDR_LOOPBACK(&addr->sin6_addr)
-			   && !IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr))
+			   && !IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr)
+			   && !IN6_IS_ADDR_SITELOCAL(&addr->sin6_addr)
+			   && !IN6_IS_ADDR_ULA(&addr->sin6_addr))
 			{
 				inet_ntop(ife->ifa_addr->sa_family,
 				          &addr->sin6_addr,
